@@ -78,29 +78,29 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         signUpText = findViewById(R.id.login_signUp_text);
 //        signInButtonGoogle = findViewById(R.id.login_googleSignIn_button);
 
-        authStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//        authStateListener = new FirebaseAuth.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//
+//                currentUser = firebaseAuth.getCurrentUser();
+//
+//                if(currentUser != null){
+//
+//                    //startActivity(new Intent(LoginActivity.this, HomePage.class));
+//
+//                }
+//                else{
+//
+//                }
+//            }
+//        };
 
-                currentUser = firebaseAuth.getCurrentUser();
-
-                if(currentUser != null){
-
-                    //startActivity(new Intent(LoginActivity.this, HomePage.class));
-
-                }
-                else{
-
-                }
-            }
-        };
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken(getString(R.string.default_web_client_id))
+//                .requestEmail()
+//                .build();
+//
+//        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         signInButton.setOnClickListener(this);
 //        signInButtonGoogle.setOnClickListener(this);
@@ -144,7 +144,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 //        startActivityForResult(signInIntent, RC_SIGN_IN);
 //    }
 
-    private void accountLogIn(String email, String password) {
+    private void accountLogIn(String email, final String password) {
 
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -155,49 +155,53 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             if(mAuth.getCurrentUser().isEmailVerified()) {
                                 progressBar.setVisibility(View.INVISIBLE);
 
+                                //Toast.makeText(LoginActivity.this, "Here", Toast.LENGTH_LONG).show();
 
-//                                Map<String, String> userObj = new HashMap<>();
-//
-//                                userObj.put("userName", currentUser.getDisplayName());
-//                                userObj.put("userId", currentUser.getUid());
-//
-//                                db.collection("Users").add(userObj)
-//                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                                            @Override
-//                                            public void onSuccess(DocumentReference documentReference) {
-//
-//                                                documentReference.get()
-//                                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                                                            @Override
-//                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//
-//                                                                progressBar.setVisibility(View.INVISIBLE);
-//
-//                                                                Namelesser namelesser = Namelesser.getInstance();
-//
-//                                                                namelesser.setUserName(getIntent().getExtras().getString("userName"));
-//                                                                namelesser.setUserId(currentUser.getUid());
-//                                                                namelesser.setUserMail(currentUser.getEmail());
-//
-//                                                                //Toast.makeText(SignUpActivity.this, Namelesser.getInstance().getUserId(), Toast.LENGTH_SHORT).show();
-//
-//                                                                Intent in=new Intent(LoginActivity.this, HomePage.class);
-//                                                                startActivity(in);
-//                                                                finish();
-//                                                            }
-//                                                        });
-//                                            }
-//                                        }).addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//                                        Toast.makeText(LoginActivity.this, "Upload Failed!", Toast.LENGTH_LONG).show();
-//                                    }
-//                                });
+                                currentUser = mAuth.getCurrentUser();
+
+                                Map<String, String> userObj = new HashMap<>();
+
+                                userObj.put("userName", currentUser.getDisplayName());
+                                userObj.put("userId", currentUser.getUid());
+
+                                db.collection("Users").add(userObj)
+                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                            @Override
+                                            public void onSuccess(DocumentReference documentReference) {
+
+                                                documentReference.get()
+                                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                                                                progressBar.setVisibility(View.INVISIBLE);
+
+                                                                Namelesser namelesser = Namelesser.getInstance();
+
+                                                                namelesser.setUserName(currentUser.getDisplayName());
+                                                                namelesser.setUserId(currentUser.getUid());
+                                                                namelesser.setUserMail(currentUser.getEmail());
+
+                                                                //Toast.makeText(SignUpActivity.this, Namelesser.getInstance().getUserId(), Toast.LENGTH_SHORT).show();
+
+                                                                Intent in=new Intent(LoginActivity.this, HomePage.class);
+                                                                startActivity(in);
+                                                                finish();
+                                                            }
+                                                        });
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(LoginActivity.this, "Upload Failed!", Toast.LENGTH_LONG).show();
+                                    }
+                                });
                             }
                             else {
                                 progressBar.setVisibility(View.INVISIBLE);
                                 mAuth.signOut();
                                 Toast.makeText(LoginActivity.this, "Please verify your email address!", Toast.LENGTH_SHORT).show();
+                                passwordEditText.setText("");
                             }
 
 
@@ -213,13 +217,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        currentUser = mAuth.getCurrentUser();
-        mAuth.addAuthStateListener(authStateListener);
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//
+//        currentUser = mAuth.getCurrentUser();
+//        mAuth.addAuthStateListener(authStateListener);
+//    }
 
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

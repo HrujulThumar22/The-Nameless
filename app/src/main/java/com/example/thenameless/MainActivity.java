@@ -51,33 +51,35 @@ public class MainActivity extends AppCompatActivity {
 
                 if(currentUser != null){
 
-                    Toast.makeText(MainActivity.this, currentUser.getUid(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, currentUser.getUid(), Toast.LENGTH_SHORT).show();
 
-                    collectionReference.document(firebaseAuth.getUid())
-                            .get()
-                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if(task.isSuccessful()) {
-                                        DocumentSnapshot document = task.getResult();
+                    if(currentUser.isEmailVerified()) {
+                        collectionReference.document(firebaseAuth.getUid())
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot document = task.getResult();
 
-                                        if(document.exists()) {
-                                            Namelesser namelesser = Namelesser.getInstance();
+                                            if (document.exists()) {
+                                                Namelesser namelesser = Namelesser.getInstance();
 
-                                            namelesser.setUserName(document.get("Name").toString());
-                                            if(document.get("PhoneNo") != null)
-                                                namelesser.setUserNumber(document.get("PhoneNo").toString());
-                                            namelesser.setUserId(currentUser.getUid());
-                                            namelesser.setUserMail(document.get("EMail").toString());
+                                                namelesser.setUserName(document.get("Name").toString());
+                                                if (document.get("PhoneNo") != null)
+                                                    namelesser.setUserNumber(document.get("PhoneNo").toString());
+                                                namelesser.setUserId(currentUser.getUid());
+                                                namelesser.setUserMail(document.get("EMail").toString());
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                });
 
 
-                    startActivity(new Intent(MainActivity.this, HomePage.class));
+                        startActivity(new Intent(MainActivity.this, HomePage.class));
 
-                    finish();
+                        finish();
+                    }
 
                 }
                 else{
