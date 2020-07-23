@@ -130,6 +130,9 @@ public class AccountDetails extends AppCompatActivity {
             finish();
             return true;
         }
+        else if (item.getItemId() == R.id.change_password) {
+            startActivity(new Intent(AccountDetails.this, ChangePassword.class));
+        }
         return false;
     }
 
