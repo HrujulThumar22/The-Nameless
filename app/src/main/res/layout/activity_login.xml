@@ -8,24 +8,45 @@
     android:orientation="vertical"
     android:background="@drawable/gradient_bg"
     android:layout_height="match_parent"
+    android:gravity="center"
     tools:context=".LoginActivity">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="76dp"
         android:padding="8dp"
         android:text="@string/hello_text3"
         android:textSize="30sp"/>
 
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/login_googleSignIn_button"
+    <AutoCompleteTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:layout_marginTop="40dp"
+        android:padding="8dp"
+        android:textSize="18sp"
+        android:id="@+id/login_email_editText"
+        android:inputType="textEmailAddress"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:layout_marginTop="20dp"
+        android:padding="8dp"
+        android:textSize="18sp"
+        android:id="@+id/login_password_editText"
+        android:inputType="textPassword"/>
+
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="106dp"/>
-
+        android:text="Sign In"
+        android:layout_marginTop="12dp"
+        android:padding="8dp"
+        android:id="@+id/login_signIn_button"
+        android:layout_gravity="center"/>
 
     <ProgressBar
         android:id="@+id/login_progressBar"
@@ -36,6 +57,24 @@
         android:indeterminateTint="@android:color/white"
         android:layout_height="wrap_content"
         android:visibility="invisible"/>
+
+<!--    <com.google.android.gms.common.SignInButton-->
+<!--        android:id="@+id/login_googleSignIn_button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:layout_marginTop="50dp"/>-->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New member? Sign Up instead"
+        android:textSize="18sp"
+        android:id="@+id/login_signUp_text"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center"/>
+
 
 
 

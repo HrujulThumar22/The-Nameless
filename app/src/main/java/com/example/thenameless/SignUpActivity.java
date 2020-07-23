@@ -145,49 +145,30 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         if(task.isSuccessful()) {
                             
                             currentUser = firebaseAuth.getCurrentUser();
-                            
-                            assert currentUser != null;
-                            currentUserId = currentUser.getUid();
-                            currentUserName = name;
 
-                            Map<String, String> userObj = new HashMap<>();
-
-                            userObj.put("userName", currentUserName);
-                            userObj.put("userId", currentUser.getUid());
-
-                            db.collection("Users").add(userObj)
-                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                    @Override
-                                    public void onSuccess(DocumentReference documentReference) {
-
-                                        documentReference.get()
-                                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
-                                                        progressBar.setVisibility(View.INVISIBLE);
-
-                                                        Namelesser namelesser = Namelesser.getInstance();
-
-                                                        namelesser.setUserName(currentUserName);
-                                                        namelesser.setUserId(currentUser.getUid());
-
-                                                        //Toast.makeText(SignUpActivity.this, Namelesser.getInstance().getUserId(), Toast.LENGTH_SHORT).show();
-
-                                                        Intent in=new Intent(SignUpActivity.this, AccountDetails.class);
-                                                        in.putExtra("type","1");
-                                                        in.putExtra("name",nameEditText.getText().toString());
-                                                        in.putExtra("email",emailEditText.getText().toString());
-                                                        startActivity(in);
-                                                    }
-                                                });
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
+                            currentUser.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(SignUpActivity.this, "Upload Failed!", Toast.LENGTH_LONG).show();
+                                public void onComplete(@NonNull Task<Void> task) {
+
+                                    if(task.isSuccessful()) {
+
+                                        Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                                        intent.putExtra("userName", nameEditText.getText().toString().trim());
+
+                                        firebaseAuth.signOut();
+
+                                        Toast.makeText(SignUpActivity.this, "Sign Up successful! Please check your email for verification!", Toast.LENGTH_SHORT).show();
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                    else {
+                                        Toast.makeText(SignUpActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+
                                 }
                             });
+                            
+
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {

@@ -25,6 +25,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -32,20 +33,25 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final int RC_SIGN_IN = 11;
+//    private static final int RC_SIGN_IN = 11;
     private AutoCompleteTextView emailEditText;
+    private TextView signUpText;
     private EditText passwordEditText;
     private Button signInButton;
     private ProgressBar progressBar;
-    private SignInButton signInButtonGoogle;
 
     static FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
@@ -65,11 +71,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         setTitle("LogIn");
 
-//        emailEditText = findViewById(R.id.login_email_editText);
-//        passwordEditText = findViewById(R.id.login_password_editText);
-//        signInButton = findViewById(R.id.login_signIn_button);
+        emailEditText = findViewById(R.id.login_email_editText);
+        passwordEditText = findViewById(R.id.login_password_editText);
+        signInButton = findViewById(R.id.login_signIn_button);
         progressBar = findViewById(R.id.login_progressBar);
-        signInButtonGoogle = findViewById(R.id.login_googleSignIn_button);
+        signUpText = findViewById(R.id.login_signUp_text);
+//        signInButtonGoogle = findViewById(R.id.login_googleSignIn_button);
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -95,8 +102,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        //signInButton.setOnClickListener(this);
-        signInButtonGoogle.setOnClickListener(this);
+        signInButton.setOnClickListener(this);
+//        signInButtonGoogle.setOnClickListener(this);
+        signUpText.setOnClickListener(this);
     }
 
     @Override
@@ -104,76 +112,106 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         switch (view.getId()){
 
-//            case R.id.login_signIn_button:
-//                //login into acc.
-//                if(!TextUtils.isEmpty(emailEditText.getText().toString().trim())
-//                        && !TextUtils.isEmpty(passwordEditText.getText().toString().trim())) {
-//
-//                    progressBar.setVisibility(View.VISIBLE);
-//
-//                    accountLogIn(emailEditText.getText().toString().trim(),
-//                            passwordEditText.getText().toString().trim());
-//                }
-//                else{
-//                    Toast.makeText(this, "Empty Fields Not Allowed!", Toast.LENGTH_SHORT).show();
-//                }
-//
+            case R.id.login_signIn_button:
+                //login into acc.
+                if(!TextUtils.isEmpty(emailEditText.getText().toString().trim())
+                        && !TextUtils.isEmpty(passwordEditText.getText().toString().trim())) {
+
+                    progressBar.setVisibility(View.VISIBLE);
+
+                    accountLogIn(emailEditText.getText().toString().trim(),
+                            passwordEditText.getText().toString().trim());
+                }
+                else{
+                    Toast.makeText(this, "Empty Fields Not Allowed!", Toast.LENGTH_SHORT).show();
+                }
+
+                break;
+//            case R.id.login_googleSignIn_button:
+//                progressBar.setVisibility(View.VISIBLE);
+//                signIn();
 //                break;
-            case R.id.login_googleSignIn_button:
-                progressBar.setVisibility(View.VISIBLE);
-                signIn();
+
+            case R.id.login_signUp_text:
+                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
                 break;
         }
 
     }
 
-    private void signIn() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-//    private void accountLogIn(String email, String password) {
-//
-//        mAuth.signInWithEmailAndPassword(email, password)
-//                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if (task.isSuccessful()) {
-//
-//                            progressBar.setVisibility(View.INVISIBLE);
-//
-//                            currentUser = mAuth.getCurrentUser();
-//
-//                            collectionReference.whereEqualTo("userId",currentUser.getUid())
-//                                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
-//                                        @Override
-//                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-//
-//                                            Namelesser namelesser = Namelesser.getInstance();
-//
-//                                            for(QueryDocumentSnapshot snapshot : queryDocumentSnapshots){
-//
-//                                                namelesser.setUserId(currentUser.getUid());
-//                                                namelesser.setUserName(snapshot.getString("userName"));
-//
-//                                            }
-//                                            //Toast.makeText(LoginActivity.this, "Username: "+ namelesser.getUserName(), Toast.LENGTH_SHORT).show();
-//
-//                                            startActivity(new Intent(LoginActivity.this, HomePage.class));
-//                                            finish();
-//                                        }
-//                                    });
-//                        } else {
-//
-//                            progressBar.setVisibility(View.INVISIBLE);
-//
-//                            Toast.makeText(LoginActivity.this, "Login Failed!!! Try Again", Toast.LENGTH_SHORT).show();
-//
-//                            passwordEditText.setText("");
-//                        }
-//                    }
-//                });
+//    private void signIn() {
+//        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+//        startActivityForResult(signInIntent, RC_SIGN_IN);
 //    }
+
+    private void accountLogIn(String email, String password) {
+
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+
+                            if(mAuth.getCurrentUser().isEmailVerified()) {
+                                progressBar.setVisibility(View.INVISIBLE);
+
+
+//                                Map<String, String> userObj = new HashMap<>();
+//
+//                                userObj.put("userName", currentUser.getDisplayName());
+//                                userObj.put("userId", currentUser.getUid());
+//
+//                                db.collection("Users").add(userObj)
+//                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                                            @Override
+//                                            public void onSuccess(DocumentReference documentReference) {
+//
+//                                                documentReference.get()
+//                                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                                                            @Override
+//                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//
+//                                                                progressBar.setVisibility(View.INVISIBLE);
+//
+//                                                                Namelesser namelesser = Namelesser.getInstance();
+//
+//                                                                namelesser.setUserName(getIntent().getExtras().getString("userName"));
+//                                                                namelesser.setUserId(currentUser.getUid());
+//                                                                namelesser.setUserMail(currentUser.getEmail());
+//
+//                                                                //Toast.makeText(SignUpActivity.this, Namelesser.getInstance().getUserId(), Toast.LENGTH_SHORT).show();
+//
+//                                                                Intent in=new Intent(LoginActivity.this, HomePage.class);
+//                                                                startActivity(in);
+//                                                                finish();
+//                                                            }
+//                                                        });
+//                                            }
+//                                        }).addOnFailureListener(new OnFailureListener() {
+//                                    @Override
+//                                    public void onFailure(@NonNull Exception e) {
+//                                        Toast.makeText(LoginActivity.this, "Upload Failed!", Toast.LENGTH_LONG).show();
+//                                    }
+//                                });
+                            }
+                            else {
+                                progressBar.setVisibility(View.INVISIBLE);
+                                mAuth.signOut();
+                                Toast.makeText(LoginActivity.this, "Please verify your email address!", Toast.LENGTH_SHORT).show();
+                            }
+
+
+                        } else {
+
+                            progressBar.setVisibility(View.INVISIBLE);
+
+                            Toast.makeText(LoginActivity.this, "Login Failed!!! Try Again", Toast.LENGTH_SHORT).show();
+
+                            passwordEditText.setText("");
+                        }
+                    }
+                });
+    }
 
     @Override
     protected void onStart() {
@@ -183,62 +221,62 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mAuth.addAuthStateListener(authStateListener);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        if(requestCode == RC_SIGN_IN && resultCode == RESULT_OK) {
+//
+//            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+//            handleSignINResult(task);
+//        }
+//        else{
+//            progressBar.setVisibility(View.INVISIBLE);
+//            Toast.makeText(LoginActivity.this, "Result Not Ok!", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
-        if(requestCode == RC_SIGN_IN && resultCode == RESULT_OK) {
-
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignINResult(task);
-        }
-        else{
-            progressBar.setVisibility(View.INVISIBLE);
-            Toast.makeText(LoginActivity.this, "Result Not Ok!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void handleSignINResult(Task<GoogleSignInAccount> task) {
-
-        try {
-            GoogleSignInAccount acc = task.getResult(ApiException.class);
-            Toast.makeText(this, "Sign In Successful", Toast.LENGTH_SHORT).show();
-            FirebaseGoogleAuth(acc);
-
-        } catch (ApiException e) {
-            progressBar.setVisibility(View.INVISIBLE);
-            Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void FirebaseGoogleAuth(GoogleSignInAccount acc) {
-
-        AuthCredential authCredential = GoogleAuthProvider.getCredential(acc.getIdToken(), null);
-        mAuth.signInWithCredential(authCredential)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            currentUser = mAuth.getCurrentUser();
-                            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
-
-                            if(account != null) {
-                                Namelesser namelesser = Namelesser.getInstance();
-                                namelesser.setUserId(currentUser.getUid());
-                                namelesser.setUserName(account.getDisplayName());
-                                //Toast.makeText(LoginActivity.this, account.getDisplayName(), Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(LoginActivity.this, HomePage.class));
-                                finish();
-                            }
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(LoginActivity.this, "Sign IN Unsuccessful!", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+//    private void handleSignINResult(Task<GoogleSignInAccount> task) {
+//
+//        try {
+//            GoogleSignInAccount acc = task.getResult(ApiException.class);
+//            Toast.makeText(this, "Sign In Successful", Toast.LENGTH_SHORT).show();
+//            FirebaseGoogleAuth(acc);
+//
+//        } catch (ApiException e) {
+//            progressBar.setVisibility(View.INVISIBLE);
+//            Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+//        }
+//    }
+//
+//    private void FirebaseGoogleAuth(GoogleSignInAccount acc) {
+//
+//        AuthCredential authCredential = GoogleAuthProvider.getCredential(acc.getIdToken(), null);
+//        mAuth.signInWithCredential(authCredential)
+//                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<AuthResult> task) {
+//                        if(task.isSuccessful()) {
+//                            progressBar.setVisibility(View.INVISIBLE);
+//                            currentUser = mAuth.getCurrentUser();
+//                            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+//
+//                            if(account != null) {
+//                                Namelesser namelesser = Namelesser.getInstance();
+//                                namelesser.setUserId(currentUser.getUid());
+//                                namelesser.setUserName(account.getDisplayName());
+//                                //Toast.makeText(LoginActivity.this, account.getDisplayName(), Toast.LENGTH_SHORT).show();
+//                                startActivity(new Intent(LoginActivity.this, HomePage.class));
+//                                finish();
+//                            }
+//                        }
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                progressBar.setVisibility(View.INVISIBLE);
+//                Toast.makeText(LoginActivity.this, "Sign IN Unsuccessful!", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
 }
