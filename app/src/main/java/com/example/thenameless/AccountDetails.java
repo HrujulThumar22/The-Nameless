@@ -210,6 +210,12 @@ public class AccountDetails extends AppCompatActivity {
         userDetails.put("PhoneNo",Namelesser.getInstance().getUserNumber());
         userDetails.put("Sem",semEditText.getText().toString());
         userDetails.put("ProfileImg",imageUrl);
+
+        Namelesser namelesser = Namelesser.getInstance();
+
+        namelesser.setUserName(nameEditText.getText().toString().trim());
+        namelesser.setUserId(currentUser.getUid());
+        namelesser.setUserMail(emailEditText.getText().toString().trim());
         //Toast.makeText(this, imageUrl, Toast.LENGTH_SHORT).show();
 
         db.collection("AccountDetails").document(currentUser.getUid())

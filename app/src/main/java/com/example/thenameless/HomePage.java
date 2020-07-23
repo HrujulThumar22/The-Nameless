@@ -230,6 +230,7 @@ public class HomePage extends AppCompatActivity implements View.OnClickListener 
                 }
                 else if (Namelesser.getInstance().getUserName() == null
                     || Namelesser.getInstance().getUserId() == null) {
+
                     Toast.makeText(this, "Enter your details in My Account to add Product!", Toast.LENGTH_SHORT).show();
                 }
                 else
